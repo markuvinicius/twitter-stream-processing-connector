@@ -1,0 +1,52 @@
+pipeline {
+
+    tools {
+        maven 'maven'
+        jdk 'jdk8'
+    }
+
+     environment {
+        registry = "markuvinicius/twitter-collector"
+        registryCredential = 'dockerhub'
+     }
+
+    agent any
+
+    stages {
+        stage ('build dependencies') {
+            steps {
+                echo 'Building Dependencies'
+                    sh '''
+                        mvn -f ./models/pom.xml clean install
+                    '''
+            }
+        }
+
+        stage ('build application') {
+            steps {
+                echo 'Testing'
+                    sh '''
+                        mvn -f ./connector/pom.xml clean package
+                    '''
+            }
+        }
+
+        stage("build application immage") {
+            steps {
+                script {
+                          sh "docker image build -t $registry:$BUILD_NUMBER --build-arg ACCESS_TOKEN=$env.ACCESS_TOKEN --build-arg CONSUMER_KEY=$env.CONSUMER_KEY --build-arg CONSUMER_SECRET=$env.CONSUMER_SECRET --build-arg TOKEN_SECRET=$env.TOKEN_SECRET ./connector"
+                }
+            }
+        }
+
+        stage("push to docker registry") {
+            steps {
+                script {
+                    docker.withRegistry( '', registryCredential ) {
+                        sh "docker image push $registry:$BUILD_NUMBER"
+                    }
+                }
+            }
+        }
+    }
+}
