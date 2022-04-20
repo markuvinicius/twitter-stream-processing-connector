@@ -1,6 +1,5 @@
 package com.markuvinicius.twitter.stream.listenner;
 
-
 import com.markuvinicius.twitter.stream.dtos.StatusDTO;
 import com.markuvinicius.twitter.stream.dtos.UserDTO;
 import com.markuvinicius.twitter.stream.jmx.MetricStatusMBeanImpl;
