@@ -13,20 +13,20 @@ pipeline {
     agent any
 
     stages {
-        stage ('build dependencies') {
-            steps {
-                echo 'Building Dependencies'
-                    sh '''
-                        mvn -f ./models/pom.xml clean install
-                    '''
-            }
-        }
 
+        stage ('testing') {
+                steps {
+                    echo 'Testing'
+                        sh '''
+                            mvn clean test
+                        '''
+                }
+        }
         stage ('build application') {
             steps {
                 echo 'Testing'
                     sh '''
-                        mvn -f ./connector/pom.xml clean package
+                        mvn clean package -DskipTests
                     '''
             }
         }
@@ -34,7 +34,7 @@ pipeline {
         stage("build application immage") {
             steps {
                 script {
-                          sh "docker image build -t $registry:$BUILD_NUMBER --build-arg ACCESS_TOKEN=$env.ACCESS_TOKEN --build-arg CONSUMER_KEY=$env.CONSUMER_KEY --build-arg CONSUMER_SECRET=$env.CONSUMER_SECRET --build-arg TOKEN_SECRET=$env.TOKEN_SECRET ./connector"
+                   sh "docker image build -t $registry:$BUILD_NUMBER --build-arg ACCESS_TOKEN=$env.ACCESS_TOKEN --build-arg CONSUMER_KEY=$env.CONSUMER_KEY --build-arg CONSUMER_SECRET=$env.CONSUMER_SECRET --build-arg TOKEN_SECRET=$env.TOKEN_SECRET ./connector"
                 }
             }
         }
