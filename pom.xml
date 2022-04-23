@@ -24,12 +24,8 @@
         <repository>
             <id>github</id>
             <url>https://maven.pkg.github.com/markuvinicius/twitter-stream-processing-dtos</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>true</enabled></snapshots>
         </repository>
     </repositories>
 
@@ -78,9 +74,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.markuvinicius.twitter.stream.dtos</groupId>
-            <artifactId>twitter-stream-dtos</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>com.markuvinicius.twitter.stream</groupId>
+            <artifactId>dtos</artifactId>
+            <version>0.0.2</version>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.testcontainers/testcontainers -->
