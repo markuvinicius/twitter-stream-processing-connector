@@ -5,6 +5,8 @@ import com.markuvinicius.twitter.stream.dtos.StatusDTO;
 import com.markuvinicius.twitter.stream.exceptions.PropertyConfigurationException;
 import com.markuvinicius.twitter.stream.jmx.MetricStatusMBeanImpl;
 import com.markuvinicius.twitter.stream.listenner.StreamListener;
+import com.markuvinicius.twitter.stream.producer.IProducer;
+import com.markuvinicius.twitter.stream.producer.ProducerFactory;
 import com.markuvinicius.twitter.stream.serializers.JsonSerializer;
 import org.aeonbits.owner.ConfigFactory;
 import org.apache.kafka.clients.producer.KafkaProducer;
@@ -42,9 +44,8 @@ public class Application {
             System.exit(1);
         }
         config = parseApplicationConfig(args[0]);
-
-        KafkaProducer<String, StatusDTO> producer = buildJsonProducer(config.kafkaBootStrapServer(), config.kafkaAppId());
-        TwitterStream stream = buildStreamListener(producer, config.kafkaTopic());
+        IProducer producer = ProducerFactory.getProducer(config);
+        TwitterStream stream = buildStreamListener(producer);
         launchStreamListener(stream,
                 config.searchTopics(),
                 config.searchLanguages());
@@ -57,7 +58,6 @@ public class Application {
     }
 
     public static ApplicationConfig parseApplicationConfig(String applicationPropertiesFileLocation) throws PropertyConfigurationException, IOException {
-        //ApplicationConfig appConfig = ConfigFactory.create(config);
         ApplicationConfig appConfig ;
         Properties props = new Properties();
         props.load(new FileInputStream(new File(applicationPropertiesFileLocation)));
@@ -77,24 +77,12 @@ public class Application {
                 || (appConfig.kafkaTopic().isEmpty()) ){
             throw new PropertyConfigurationException("kafka.topic.name property can not be empty");
         }
-
         return appConfig;
     }
 
-    public static KafkaProducer<String, StatusDTO> buildJsonProducer(String bootStrapServer, String appId) {
-        Properties configProperties = new Properties();
-        configProperties.put(ProducerConfig.CLIENT_ID_CONFIG, appId);
-        configProperties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServer);
+    private static TwitterStream buildStreamListener(IProducer<?, ?> defaultProducer) {
 
-        JsonSerializer<StatusDTO> serializer = new JsonSerializer<>();
-        KafkaProducer<String, StatusDTO> producer = new KafkaProducer(configProperties, Serdes.String().serializer(), serializer);
-        return producer;
-    }
-
-    private static TwitterStream buildStreamListener(KafkaProducer<String, StatusDTO> defaultProducer,
-                                                     String kafkaTopic) {
-
-        StreamListener statusListener = new StreamListener(defaultProducer, kafkaTopic);
+        StreamListener statusListener = new StreamListener(defaultProducer);
         TwitterStream twitterStream = new TwitterStreamFactory( getTwitterConfiguration() ).getInstance();
         twitterStream.addListener(statusListener);
 
