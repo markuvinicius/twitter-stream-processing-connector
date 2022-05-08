@@ -28,7 +28,7 @@ jobs:
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     - name: Show settings
-      run: echo $GITHUB_WORKSPACE/settings.xml
+      run: cat $GITHUB_WORKSPACE/settings.xml
 
 
     - name: Build with Maven
