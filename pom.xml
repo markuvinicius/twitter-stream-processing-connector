@@ -6,7 +6,7 @@
 
     <groupId>com.markuvinicius.twitter.stream</groupId>
     <artifactId>connector</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.3-SNAPSHOT</version>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
