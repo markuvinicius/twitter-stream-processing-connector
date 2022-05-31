@@ -26,6 +26,18 @@ jobs:
         distribution: 'temurin'
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
+    - name: Cache source code
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-source-code
+      with:
+        # npm cache files are stored in `~/.npm` on Linux/macOS
+        path: ~
+        key: ${{ runner.os }}-build-${{ env.cache-name }}
+        restore-keys: |
+          ${{ runner.os }}-build-${{ env.cache-name }}-
+          ${{ runner.os }}-build-
+          ${{ runner.os }}-
     - name: Test with Maven
       run: mvn clean test --file pom.xml -s $GITHUB_WORKSPACE/settings.xml
       env:
